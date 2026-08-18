@@ -287,8 +287,10 @@
 <footer>&copy;Todos os direitos reservados Dynamic Informática · Dynamic Iphones 2026</footer>
 
 <script>
-  
-import { Analytics } from "@vercel/analytics/next"
+
+import { inject } from "@vercel/analytics"
+
+inject()
 
 /* Numero do WhatsApp */
 const WHATSAPP_NUMBER = "5545999124898";
