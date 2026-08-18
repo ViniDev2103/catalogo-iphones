@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="logo.png">
+<title>Dynamic Iphones</title>
+<style>
+  :root{
+    --bg:#0E1012;
+    --surface:#16191D;
+    --surface-2:#1E2227;
+    --line:#2A2F35;
+    --text:#F3F2ED;
+    --text-dim:#9AA0A8;
+    --accent:#4FA98D;
+    --accent-dim:#33685A;
+    --accent-2:#E8A33D;
+    --danger:#E2574C;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3, .display{ font-family:'Space Grotesk',sans-serif; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  /* HEADER */
+  header{
+    position:sticky; top:0; z-index:40;
+    background:rgba(14,16,18,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+    padding:16px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-logo{
+    width:42px; height:42px; border-radius:50%; object-fit:cover;
+    box-shadow:0 0 0 1px var(--line);
+  }
+  .brand-name{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:19px; letter-spacing:-0.01em; }
+  .brand-sub{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; }
+
+  .cart-btn{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface-2); border:1px solid var(--line);
+    padding:10px 16px; border-radius:999px; cursor:pointer;
+    color:var(--text); font-weight:500; font-size:14px;
+    transition:border-color .15s ease;
+  }
+  .cart-btn:hover{ border-color:var(--accent); }
+  .cart-count{
+    background:var(--accent-2); color:#1a1200; font-weight:700;
+    font-family:'JetBrains Mono',monospace; font-size:12px;
+    min-width:20px; height:20px; border-radius:999px;
+    display:flex; align-items:center; justify-content:center; padding:0 5px;
+  }
+
+  /* HERO */
+  .hero{
+    padding:64px 28px 40px; max-width:1200px; margin:0 auto;
+    display:flex; gap:48px; align-items:flex-end; flex-wrap:wrap;
+  }
+  .hero h1{ font-size:clamp(32px,5vw,52px); line-height:1.05; letter-spacing:-0.02em; max-width:640px;}
+  .hero h1 em{ font-style:normal; color:var(--accent); }
+  .hero p{ color:var(--text-dim); margin-top:14px; max-width:480px; font-size:15px; line-height:1.6; }
+
+  .seal{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; min-width:230px;
+    position:relative;
+  }
+  .seal::before{
+    content:""; position:absolute; left:-7px; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+  }
+  .seal::after{
+    content:""; position:absolute; right:-7px; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; border-radius:50%; background:var(--bg); border:1px solid var(--line);
+  }
+  .seal-row{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 0; border-bottom:1px dashed var(--line); color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; }
+  .seal-row:last-child{ border-bottom:none; }
+  .seal-row b{ color:var(--text); font-weight:600; }
+
+  /*  FILTERS  */
+  .filters{
+    max-width:1200px; margin:0 auto; padding:0 28px 8px;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .chip{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.03em;
+    padding:8px 14px; border-radius:999px; border:1px solid var(--line);
+    background:transparent; color:var(--text-dim); cursor:pointer; transition:all .15s ease;
+  }
+  .chip:hover{ color:var(--text); border-color:#454b52; }
+  .chip.active{ background:var(--accent); border-color:var(--accent); color:#0a1210; font-weight:700; }
+
+  /*  GRID  */
+  .grid{
+    max-width:1200px; margin:0 auto; padding:24px 28px 100px;
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:20px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; display:flex; flex-direction:column; gap:14px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{ border-color:#3a4147; transform:translateY(-2px); }
+
+  .visual-wrap{ display:flex; justify-content:center; padding:14px 0 4px; }
+  .phone{
+    width:76px; height:150px; border-radius:16px; position:relative;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.35);
+    transition:background .2s ease;
+  }
+  .phone::before{ /* island / notch */
+    content:""; position:absolute; top:9px; left:50%; transform:translateX(-50%);
+    width:26px; height:7px; border-radius:5px; background:rgba(0,0,0,0.45);
+  }
+  .phone::after{ /* camera bump */
+    content:""; position:absolute; top:8px; right:8px;
+    width:20px; height:20px; border-radius:6px; background:rgba(0,0,0,0.25);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
+  }
+
+  .card h3{ font-size:17px; letter-spacing:-0.01em; }
+  .card .gen-tag{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .ticket{
+    border-top:1px dashed var(--line); border-bottom:1px dashed var(--line);
+    padding:10px 0; display:flex; flex-direction:column; gap:5px;
+  }
+  .ticket-row{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.03em; }
+  .ticket-row b{ color:var(--text); font-weight:500; text-transform:none; }
+
+  .colors{ display:flex; gap:7px; flex-wrap:wrap; }
+  .swatch{
+    width:22px; height:22px; border-radius:50%; cursor:pointer;
+    border:2px solid transparent; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+  }
+  .swatch.selected{ border-color:var(--accent); }
+
+  .row-controls{ display:flex; gap:8px; align-items:center; }
+  select.storage-select{
+    flex:1; background:var(--surface-2); color:var(--text); border:1px solid var(--line);
+    border-radius:8px; padding:9px 10px; font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    cursor:pointer;
+  }
+
+  .price-row{ display:flex; align-items:baseline; justify-content:space-between; margin-top:2px; }
+  .price{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:19px; color:var(--accent-2); }
+  .price-label{ font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; }
+
+  .add-btn{
+    background:var(--accent); color:#0a1210; border:none; border-radius:9px;
+    padding:11px; font-weight:700; font-size:13.5px; cursor:pointer; letter-spacing:0.01em;
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .add-btn:hover{ filter:brightness(1.08); }
+  .add-btn:active{ transform:scale(0.98); }
+  .add-btn.added{ background:var(--surface-2); color:var(--accent); border:1px solid var(--accent); }
+
+  /*  CART DRAWER  */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(400px, 100vw);
+    background:var(--surface); border-left:1px solid var(--line); z-index:51;
+    display:flex; flex-direction:column;
+    transform:translateX(100%); transition:transform .25s ease;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{
+    padding:20px 22px; border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .drawer-head h2{ font-size:19px; }
+  .close-btn{ background:none; border:none; color:var(--text-dim); font-size:22px; cursor:pointer; line-height:1; }
+  .close-btn:hover{ color:var(--text); }
+
+  .drawer-body{ flex:1; overflow-y:auto; padding:16px 22px; display:flex; flex-direction:column; gap:14px; }
+  .empty-cart{ color:var(--text-dim); font-size:14px; text-align:center; margin-top:60px; line-height:1.6; }
+
+  .cart-item{ display:flex; gap:12px; border-bottom:1px solid var(--line); padding-bottom:14px; }
+  .cart-item .mini-phone{ width:34px; height:64px; border-radius:8px; flex-shrink:0; margin-top:2px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); }
+  .cart-item-info{ flex:1; }
+  .cart-item-info .name{ font-weight:600; font-size:14px; }
+  .cart-item-info .meta{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-dim); margin-top:2px; text-transform:uppercase; }
+  .qty-row{ display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .qty-btn{ width:22px; height:22px; border-radius:6px; background:var(--surface-2); border:1px solid var(--line); color:var(--text); cursor:pointer; font-size:13px; }
+  .qty-val{ font-family:'JetBrains Mono',monospace; font-size:13px; min-width:16px; text-align:center; }
+  .remove-link{ font-size:11px; color:var(--danger); cursor:pointer; margin-left:auto; text-decoration:underline; }
+  .cart-item-price{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--accent-2); font-size:13.5px; white-space:nowrap; }
+
+  .drawer-foot{ border-top:1px solid var(--line); padding:18px 22px 22px; }
+  .total-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+  .total-row .label{ font-size:13px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em; }
+  .total-row .amount{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:22px; color:var(--text); }
+
+  .whatsapp-btn{
+    width:100%; background:#25D366; color:#052e16; border:none; border-radius:10px;
+    padding:14px; font-weight:700; font-size:14.5px; cursor:pointer; display:flex;
+    align-items:center; justify-content:center; gap:8px; transition:filter .15s ease;
+  }
+  .whatsapp-btn:hover{ filter:brightness(1.05); }
+  .whatsapp-btn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .note{ font-size:11px; color:var(--text-dim); margin-top:10px; text-align:center; line-height:1.5; }
+
+  footer{ text-align:center; padding:30px; color:var(--text-dim); font-size:12px; font-family:'JetBrains Mono',monospace; }
+
+  @media (max-width:640px){
+    header{ padding:14px 18px; }
+    .hero{ padding:40px 18px 28px; }
+    .filters{ padding:0 18px 8px; }
+    .grid{ padding:20px 18px 90px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="logo.png" alt="Dynamic Informática" class="brand-logo">
+    <div>
+      <div class="brand-name">Dynamic Iphones</div>
+      <div class="brand-sub">Dynamic Informática · iPhones Novos e Seminovos</div>
+    </div>
+  </div>
+  <button class="cart-btn" onclick="toggleCart(true)">
+    🛒 Carrinho <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>Iphones Novos e Seminovos<br><em>Garantia e procêdencia</em></h1>
+    <p>Catálogo completo da linha 13 até a 17 Pro Max — chip, tela, câmera, cores e preço de cada modelo. Monte seu pedido e finalize direto no WhatsApp.</p>
+  </div>
+  <div class="seal">
+    <div class="seal-row"><span>Condição</span><b>Novo / Lacrado</b></div>
+    <div class="seal-row"><span>Garantia</span><b>1 ano</b></div>
+    <div class="seal-row"><span>Entrega</span><b>Combinada no Whats</b></div>
+    <div class="seal-row"><span>Pagamento</span><b>Pix / Cartão</b></div>
+  </div>
+</section>
+
+<div class="filters" id="filters"></div>
+
+<div class="grid" id="grid"></div>
+
+<div class="overlay" id="overlay" onclick="toggleCart(false)"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <h2>Seu pedido</h2>
+    <button class="close-btn" onclick="toggleCart(false)">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <div class="total-row">
+      <span class="label">Total</span>
+      <span class="amount mono" id="totalAmount">R$ 0</span>
+    </div>
+    <button class="whatsapp-btn" id="checkoutBtn" onclick="checkoutWhatsApp()" disabled>
+      Finalizar pedido no WhatsApp
+    </button>
+    <p class="note">Ao finalizar, o pedido é montado automaticamente e enviado para o nosso WhatsApp — nenhuma cobrança é feita aqui.</p>
+  </div>
+</aside>
+
+<footer>&copy;Todos os direitos reservados Dynamic Informática · Dynamic Iphones 2026</footer>
+
+<script>
+
+/* Numero do WhatsApp */
+const WHATSAPP_NUMBER = "5545999124898";
+
+/* Catalogo de produtos e cores */
+const COLOR_HEX = {
+  "Preto":"#1c1c1e", "Branco":"#f0efe9", "Roxo":"#7d6a8c", "Verde":"#57705f",
+  "Amarelo":"#e6d27c", "(PRODUCT)RED":"#a83228",
+  "Cinza-espacial":"#3a3a3c", "Prateado":"#e6e5e0", "Dourado":"#d9c8a6", "Verde-meia-noite":"#3f5044",
+  "Azul-pacífico":"#49596b", "Azul":"#4a6fa5",
+  "Meia-noite":"#2b2d38", "Estelar":"#e9e3d6", "Rosa":"#e6c3c8", "Azul-serra":"#7d97a8",
+  "Grafite":"#3d3d3f", "Azul-sierra":"#7d97a8",
+  "Preto-espacial":"#302f2d", "Roxo-profundo":"#4a3f56",
+  "Verde-acinzentado":"#8a9a86", "Azul-marinho":"#33435a",
+  "Titânio-natural":"#a79c8f", "Titânio-azul":"#4f5b66", "Titânio-branco":"#e6e2d8", "Titânio-preto":"#2b2a28",
+  "Titânio-deserto":"#b8a082",
+  "Azul-névoa":"#a9c0d0", "Laranja-cósmico":"#c96a30", "Azul-profundo":"#2a4a6a"
+};
+
+const CATALOG = [
+  //{ id:"11", gen:"iPhone 11", name:"iPhone 11 - Seminovo", chip:"A13 Bionic", screen:'6.1"', camera:"Dupla 12MP",
+  //  colors:["Preto","Branco","Roxo","Verde","Amarelo","(PRODUCT)RED"],
+  // variants:[{storage:"64GB",price:1200},{storage:"128GB",price:1500}] },
+  //{ id:"11p", gen:"iPhone 11", name:"iPhone 11 Pro - Seminovo", chip:"A13 Bionic", screen:'5.8"', camera:"Tripla 12MP",
+  //  colors:["Cinza-espacial","Prateado","Dourado","Verde-meia-noite"],
+  //  variants:[{storage:"64GB",price:1599},{storage:"256GB",price:1899}] },
+  //{ id:"11pm", gen:"iPhone 11", name:"iPhone 11 Pro Max - Seminovo", chip:"A13 Bionic", screen:'6.5"', camera:"Tripla 12MP",
+  //  colors:["Cinza-espacial","Prateado","Dourado","Verde-meia-noite"],
+  //  variants:[{storage:"64GB",price:1699},{storage:"256GB",price:1999}] },    
+
+  //{ id:"12", gen:"iPhone 12", name:"iPhone 12 - Seminovo", chip:"A14 Bionic", screen:'6.1"', camera:"Dupla 12MP",
+  //  colors:["Preto","Branco","(PRODUCT)RED","Verde","Azul","Roxo"],
+  //  variants:[{storage:"64GB",price:1200},{storage:"128GB",price:1500}] },
+  //{ id:"12p", gen:"iPhone 12", name:"iPhone 12 Pro - Seminovo", chip:"A14 Bionic", screen:'6.1"', camera:"Tripla 12MP + LiDAR",
+  //  colors:["Grafite","Prateado","Dourado","Azul-pacífico"],
+  //  variants:[{storage:"128GB",price:1400},{storage:"256GB",price:1650}] },
+  //{ id:"12pm", gen:"iPhone 12", name:"iPhone 12 Pro Max - Seminovo", chip:"A14 Bionic", screen:'6.7"', camera:"Tripla 12MP + LiDAR",
+  //  colors:["Grafite","Prateado","Dourado","Azul-pacífico"],
+  //  variants:[{storage:"128GB",price:1600},{storage:"256GB",price:1850}] },
+
+  { id:"13", gen:"iPhone 13", name:"iPhone 13 - Seminovo", chip:"A15 Bionic", screen:'6.1"', camera:"Dupla 12MP",
+    colors:["Meia-noite","Estelar","(PRODUCT)RED","Rosa","Azul"],
+    variants:[{storage:"128GB",price:2399},{storage:"256GB",price:2699}] },
+  { id:"13p", gen:"iPhone 13", name:"iPhone 13 Pro - Seminovo", chip:"A15 Bionic", screen:'6.1"', camera:"Tripla 12MP + LiDAR",
+    colors:["Grafite","Prateado","Dourado","Azul-sierra"],
+    variants:[{storage:"128GB",price:2599},{storage:"256GB",price:2899}] },
+  { id:"13pm", gen:"iPhone 13", name:"iPhone 13 Pro Max - Seminovo", chip:"A15 Bionic", screen:'6.7"', camera:"Tripla 12MP + LiDAR",
+    colors:["Grafite","Prateado","Dourado","Azul-sierra"],
+    variants:[{storage:"128GB",price:2999},{storage:"256GB",price:3299}] },
+
+  { id:"14", gen:"iPhone 14", name:"iPhone 14 - Seminovo", chip:"A15 Bionic", screen:'6.1"', camera:"Dupla 12MP",
+    colors:["Meia-noite","Estelar","(PRODUCT)RED","Roxo","Azul","Amarelo"],
+    variants:[{storage:"128GB",price:2399},{storage:"256GB",price:2699}] },
+  { id:"14p", gen:"iPhone 14", name:"iPhone 14 Pro - Seminovo", chip:"A16 Bionic", screen:'6.1"', camera:"Tripla 48MP · Dynamic Island",
+    colors:["Preto-espacial","Prateado","Dourado","Roxo-profundo"],
+    variants:[{storage:"128GB",price:2899},{storage:"256GB",price:3299}] },
+  { id:"14pm", gen:"iPhone 14", name:"iPhone 14 Pro Max - Seminovo", chip:"A16 Bionic", screen:'6.7"', camera:"Tripla 48MP · Dynamic Island",
+    colors:["Preto-espacial","Prateado","Dourado","Roxo-profundo"], 
+    variants:[{storage:"128GB",price:3399},{storage:"256GB",price:3699}] },
+
+  { id:"15", gen:"iPhone 15", name:"iPhone 15 - Seminovo", chip:"A16 Bionic", screen:'6.1"', camera:"Dupla 48MP · USB-C",
+    colors:["Preto","Azul","Verde","Amarelo","Rosa"],
+    variants:[{storage:"128GB",price:2999},{storage:"256GB",price:3299}] },
+  { id:"15p", gen:"iPhone 15", name:"iPhone 15 Pro - Seminovo", chip:"A17 Pro", screen:'6.1"', camera:"Tripla 48MP · Titânio",
+    colors:["Titânio-natural","Titânio-azul","Titânio-branco","Titânio-preto"],
+    variants:[{storage:"128GB",price:3499},{storage:"256GB",price:3799}] },
+  { id:"15pm", gen:"iPhone 15", name:"iPhone 15 Pro Max - Seminovo", chip:"A17 Pro", screen:'6.7"', camera:"Tripla 48MP · Zoom 5x · Titânio",
+    colors:["Titânio-natural","Titânio-azul","Titânio-branco","Titânio-preto"],
+    variants:[{storage:"256GB",price:4199},{storage:"512GB",price:4499}] },
+
+  { id:"16", gen:"iPhone 16", name:"iPhone 16 - Seminovo", chip:"A18", screen:'6.1"', camera:"Dupla 48MP · Botão Câmera",
+    colors:["Preto","Branco","Rosa","Verde-acinzentado","Azul-marinho"],
+    variants:[{storage:"128GB",price:4199},{storage:"256GB",price:4499}] },
+  { id:"16p", gen:"iPhone 16", name:"iPhone 16 Pro - Seminovo", chip:"A18 Pro", screen:'6.3"', camera:"Tripla 48MP · Titânio",
+    colors:["Titânio-natural","Titânio-deserto","Titânio-branco","Titânio-preto"],
+    variants:[{storage:"128GB",price:4499},{storage:"256GB",price:4799}] },
+  { id:"16pm", gen:"iPhone 16", name:"iPhone 16 Pro Max - Seminovo", chip:"A18 Pro", screen:'6.9"', camera:"Tripla 48MP · Zoom 5x · Titânio",
+    colors:["Titânio-natural","Titânio-deserto","Titânio-branco","Titânio-preto"],
+    variants:[{storage:"256GB",price:5099},{storage:"512GB",price:5399}] },
+
+  { id:"17", gen:"iPhone 17", name:"iPhone 17 - Novo", chip:"A19", screen:'6.3"', camera:"Dupla 48MP",
+    colors:["Preto","Branco","Azul-névoa","Verde"],
+    variants:[{storage:"256GB",price:5799},{storage:"512GB",price:6499}] },
+  { id:"17p", gen:"iPhone 17", name:"iPhone 17 Pro - Novo", chip:"A19 Pro", screen:'6.3"', camera:"Tripla 48MP · Alumínio",
+    colors:["Laranja-cósmico","Prateado","Azul-profundo"],
+    variants:[{storage:"256GB",price:6899},{storage:"512GB",price:7799}] },
+  { id:"17pm", gen:"iPhone 17", name:"iPhone 17 Pro Max - Novo", chip:"A19 Pro", screen:'6.9"', camera:"Tripla 48MP · Zoom 8x · Alumínio",
+    colors:["Laranja-cósmico","Prateado","Azul-profundo"],
+    variants:[{storage:"256GB",price:7599},{storage:"512GB",price:8199}] },
+];
+
+/* Filtro de geração */
+const GENS = ["Todos", ...new Set(CATALOG.map(p=>p.gen))];
+
+/* ESTADO */
+let cart = [];               // {key, name, storage, color, price, qty}
+let activeFilter = "Todos";
+const cardState = {};        // per-product selected color/storage index
+
+function fmtBRL(n){ return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+
+/* PERSISTÊNCIA (carrinho fica salvo entre visitas) */
+async function loadCart(){
+  try{
+    const res = await window.storage.get('cart');
+    if(res && res.value){ cart = JSON.parse(res.value); }
+  }catch(e){ /* sem carrinho salvo ainda — tudo bem */ }
+}
+async function saveCart(){
+  try{ await window.storage.set('cart', JSON.stringify(cart)); }
+  catch(e){ console.warn('Não foi possível salvar o carrinho', e); }
+}
+
+/* RENDER — FILTROS */
+function renderFilters(){
+  const el = document.getElementById('filters');
+  el.innerHTML = GENS.map(g =>
+    `<button class="chip ${g===activeFilter?'active':''}" onclick="setFilter('${g}')">${g}</button>`
+  ).join('');
+}
+function setFilter(g){ activeFilter = g; renderFilters(); renderGrid(); }
+
+/* RENDER — GRID DE PRODUTOS*/
+function renderGrid(){
+  const el = document.getElementById('grid');
+  const items = CATALOG.filter(p => activeFilter==="Todos" || p.gen===activeFilter);
+
+  el.innerHTML = items.map(p => {
+    if(!cardState[p.id]) cardState[p.id] = { colorIdx:0, storageIdx:0 };
+    const st = cardState[p.id];
+    const color = p.colors[st.colorIdx];
+    const hex = COLOR_HEX[color] || "#555";
+    const variant = p.variants[st.storageIdx];
+
+    return `
+    <div class="card">
+      <div>
+        <span class="gen-tag">${p.gen}</span>
+        <h3>${p.name}</h3>
+      </div>
+      <div class="visual-wrap">
+        <div class="phone" id="phone-${p.id}" style="background:${hex}"></div>
+      </div>
+      <div class="ticket">
+        <div class="ticket-row"><span>Chip</span><b>${p.chip}</b></div>
+        <div class="ticket-row"><span>Tela</span><b>${p.screen}</b></div>
+        <div class="ticket-row"><span>Câmera</span><b>${p.camera}</b></div>
+      </div>
+      <div class="colors">
+        ${p.colors.map((c,i)=>`
+          <div class="swatch ${i===st.colorIdx?'selected':''}"
+               style="background:${COLOR_HEX[c]||'#555'}"
+               title="${c}"
+               onclick="selectColor('${p.id}',${i})"></div>
+        `).join('')}
+      </div>
+      <div class="row-controls">
+        <select class="storage-select" onchange="selectStorage('${p.id}', this.selectedIndex)">
+          ${p.variants.map((v,i)=>`<option ${i===st.storageIdx?'selected':''}>${v.storage}</option>`).join('')}
+        </select>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Preço</span>
+        <span class="price mono">${fmtBRL(variant.price)}</span>
+      </div>
+      <button class="add-btn" id="btn-${p.id}" onclick="addToCart('${p.id}')">Adicionar ao carrinho</button>
+    </div>`;
+  }).join('');
+}
+
+function selectColor(id, idx){
+  cardState[id].colorIdx = idx;
+  const p = CATALOG.find(x=>x.id===id);
+  document.getElementById('phone-'+id).style.background = COLOR_HEX[p.colors[idx]] || "#555";
+  renderGrid(); // re-render to update selected ring + swatch state cleanly
+}
+function selectStorage(id, idx){
+  cardState[id].storageIdx = idx;
+  renderGrid();
+}
+
+/* CARRINHO */
+function addToCart(id){
+  const p = CATALOG.find(x=>x.id===id);
+  const st = cardState[id];
+  const color = p.colors[st.colorIdx];
+  const variant = p.variants[st.storageIdx];
+  const key = `${id}-${variant.storage}-${color}`;
+
+  const existing = cart.find(c => c.key === key);
+  if(existing){ existing.qty += 1; }
+  else{
+    cart.push({ key, name:p.name, storage:variant.storage, color, price:variant.price, qty:1 });
+  }
+  saveCart();
+  renderCartCount();
+  renderCartDrawer();
+
+  const btn = document.getElementById('btn-'+id);
+  btn.textContent = "Adicionado ✓";
+  btn.classList.add('added');
+  setTimeout(()=>{ btn.textContent = "Adicionar ao carrinho"; btn.classList.remove('added'); }, 1200);
+}
+
+function changeQty(key, delta){
+  const item = cart.find(c=>c.key===key);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0){ cart = cart.filter(c=>c.key!==key); }
+  saveCart();
+  renderCartCount();
+  renderCartDrawer();
+}
+function removeItem(key){
+  cart = cart.filter(c=>c.key!==key);
+  saveCart();
+  renderCartCount();
+  renderCartDrawer();
+}
+
+function cartTotal(){ return cart.reduce((s,c)=>s + c.price*c.qty, 0); }
+function cartQty(){ return cart.reduce((s,c)=>s + c.qty, 0); }
+
+function renderCartCount(){
+  document.getElementById('cartCount').textContent = cartQty();
+}
+
+function renderCartDrawer(){
+  const body = document.getElementById('drawerBody');
+  const totalEl = document.getElementById('totalAmount');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+
+  if(cart.length === 0){
+    body.innerHTML = `<div class="empty-cart">Seu carrinho está vazio.<br>Escolha um iPhone no catálogo para começar.</div>`;
+  } else {
+    body.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="mini-phone" style="background:${COLOR_HEX[item.color]||'#555'}"></div>
+        <div class="cart-item-info">
+          <div class="name">${item.name}</div>
+          <div class="meta">${item.storage} · ${item.color}</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="changeQty('${item.key}',-1)">−</button>
+            <span class="qty-val">${item.qty}</span>
+            <button class="qty-btn" onclick="changeQty('${item.key}',1)">+</button>
+            <span class="remove-link" onclick="removeItem('${item.key}')">remover</span>
+          </div>
+        </div>
+        <div class="cart-item-price">${fmtBRL(item.price*item.qty)}</div>
+      </div>
+    `).join('');
+  }
+  totalEl.textContent = fmtBRL(cartTotal());
+  checkoutBtn.disabled = cart.length === 0;
+}
+
+function toggleCart(open){
+  document.getElementById('drawer').classList.toggle('open', open);
+  document.getElementById('overlay').classList.toggle('open', open);
+}
+
+/* CHECKOUT — monta a mensagem e abre o WhatsApp */
+function checkoutWhatsApp(){
+  if(cart.length===0) return;
+  let msg = "Olá! Quero fazer o seguinte pedido:\n\n";
+  cart.forEach(item=>{
+    msg += `• ${item.name} — ${item.storage} — ${item.color} (x${item.qty}) — ${fmtBRL(item.price*item.qty)}\n`;
+  });
+  msg += `\nTotal: ${fmtBRL(cartTotal())}`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+/* INIT */
+(async function init(){
+  await loadCart();
+  renderFilters();
+  renderGrid();
+  renderCartCount();
+  renderCartDrawer();
+})();
+</script>
+</body>
+</html>
