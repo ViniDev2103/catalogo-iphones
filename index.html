@@ -464,7 +464,10 @@ function renderGrid(){
 function selectColor(id, idx){
   cardState[id].colorIdx = idx;
   const p = CATALOG.find(x=>x.id===id);
-  document.getElementById('phone-'+id).style.background = COLOR_HEX[p.colors[idx]] || "#555";
+  const photo = p.photos && p.photos[idx] ? p.photos[idx] : null;
+  const phoneEl = document.getElementById('grid').querySelector(`#btn-${id}`).closest('.card').querySelector('.phone-photo-container');
+  if(photo){ phoneEl.innerHTML = `<img src="${photo}" alt="${p.name}" class="phone-photo">`; }
+  else{ phoneEl.innerHTML = ''; }
   renderGrid(); // re-render to update selected ring + swatch state cleanly
 }
 function selectStorage(id, idx){
