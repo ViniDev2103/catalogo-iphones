@@ -106,6 +106,13 @@
     max-width:1200px; margin:0 auto; padding:24px 28px 100px;
     display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:20px;
   }
+  .phone-photo{ 
+    width:auto; height:150px; object-fit:cover; border-radius:16px; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.35); 
+  }
+  .phone-photo-container{
+    width:auto; height:150px; border-radius:16px; overflow:hidden;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.35);
+  }
   .card{
     background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
     padding:20px; display:flex; flex-direction:column; gap:14px;
@@ -115,7 +122,7 @@
 
   .visual-wrap{ display:flex; justify-content:center; padding:14px 0 4px; }
   .phone{
-    width:76px; height:150px; border-radius:16px; position:relative;
+    width:105px; height:150px; border-radius:16px; position:relative;
     box-shadow: inset 0 0 0 2px rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.35);
     transition:background .2s ease;
   }
@@ -321,7 +328,8 @@ const CATALOG = [
   //  variants:[{storage:"128GB",price:1600},{storage:"256GB",price:1850}] },
 
   { id:"13", gen:"iPhone 13", name:"iPhone 13 - Seminovo", chip:"A15 Bionic", screen:'6.1"', camera:"Dupla 12MP",
-    colors:["Meia-noite","Estelar","(PRODUCT)RED","Rosa","Azul"],
+    colors:["Meia-noite","Estelar","(PRODUCT)RED","Azul"],
+    photos:["img/iphone13black.jpg","img/iphone13white.jpg","img/iphone13red.jpg","img/iphone13blue.jpg"],
     variants:[{storage:"128GB",price:2399},{storage:"256GB",price:2699}] },
   { id:"13p", gen:"iPhone 13", name:"iPhone 13 Pro - Seminovo", chip:"A15 Bionic", screen:'6.1"', camera:"Tripla 12MP + LiDAR",
     colors:["Grafite","Prateado","Dourado","Azul-sierra"],
@@ -413,6 +421,7 @@ function renderGrid(){
     const color = p.colors[st.colorIdx];
     const hex = COLOR_HEX[color] || "#555";
     const variant = p.variants[st.storageIdx];
+    const photo = p.photos && p.photos[st.colorIdx] ? p.photos[st.colorIdx] : null;
 
     return `
     <div class="card">
@@ -421,7 +430,9 @@ function renderGrid(){
         <h3>${p.name}</h3>
       </div>
       <div class="visual-wrap">
-        <div class="phone" id="phone-${p.id}" style="background:${hex}"></div>
+        <div class="phone-photo-container">
+          ${photo ? `<img src="${photo}" alt="${p.name}" class="phone-photo">` : ''}
+        </div>
       </div>
       <div class="ticket">
         <div class="ticket-row"><span>Chip</span><b>${p.chip}</b></div>
@@ -468,11 +479,12 @@ function addToCart(id){
   const color = p.colors[st.colorIdx];
   const variant = p.variants[st.storageIdx];
   const key = `${id}-${variant.storage}-${color}`;
+  const photo = p.photos && p.photos[st.colorIdx] ? p.photos[st.colorIdx] : null;
 
   const existing = cart.find(c => c.key === key);
   if(existing){ existing.qty += 1; }
   else{
-    cart.push({ key, name:p.name, storage:variant.storage, color, price:variant.price, qty:1 });
+    cart.push({ key, name:p.name, storage:variant.storage, color, price:variant.price, qty:1, photo });
   }
   saveCart();
   renderCartCount();
@@ -517,7 +529,7 @@ function renderCartDrawer(){
   } else {
     body.innerHTML = cart.map(item => `
       <div class="cart-item">
-        <div class="mini-phone" style="background:${COLOR_HEX[item.color]||'#555'}"></div>
+        ${item.photo ? `<img src="${item.photo}" alt="${item.name}" class="mini-phone">` : ''}
         <div class="cart-item-info">
           <div class="name">${item.name}</div>
           <div class="meta">${item.storage} · ${item.color}</div>
